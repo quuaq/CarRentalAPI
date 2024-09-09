@@ -2,6 +2,6 @@
 {
     public class Role
     {
-        //Role sınıfına yorum satırı eklendi (((((())))
+       
     }
 }
