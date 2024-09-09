@@ -21,8 +21,5 @@ namespace CarRentalAPI.Entities
         public virtual Role? Role { get; set; } // Foreing Key ilişkisi tanımlama
 
 
-
-
-
     }
 }
