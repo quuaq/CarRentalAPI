@@ -6,7 +6,7 @@ namespace CarRentalAPI.Entities
     public class Role
     {
         [Key, Column("RoleID")]
-        public int RoleID { get; set; }
+        public int Role_ID { get; set; }
         public string? RoleName { get; set; }
         public string? Description { get; set; }
         public virtual ICollection<User>? Users { get; set; }

@@ -5,8 +5,8 @@ namespace CarRentalAPI.Entities
 {
     public class Car
     {
-        [Key, Column("ID")]
-        public int ID { get; set; }
+        [Key, Column("CAr_ID")]
+        public int Car_ID { get; set; }
         public string? Make { get; set; } // Araç Markası
         public string?  Model { get; set; }
         public int Year { get; set; } // Üretim yılı

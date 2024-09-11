@@ -14,10 +14,10 @@ namespace CarRentalAPI.Entities
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
         public string? PhoneNumber { get; set; }
-        public int RolID { get; set; }
+        public int Role_ID { get; set; }
         public DateTime CreatedDate { get; set; } // Hesap olıuşturma tarihi
 
-        [ForeignKey("RoleId")]
+        [ForeignKey("Role_ID")]
         public virtual Role? Role { get; set; } // Foreing Key ilişkisi tanımlama
 
 
