@@ -23,8 +23,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(); //Swagger'ý etkinleþtirir
+    app.UseSwaggerUI(); //SwaggerUI arayüzünü etkinleþtirir
 }
 
 app.UseHttpsRedirection();
