@@ -24,20 +24,22 @@ namespace CarRentalAPI.Controllers
         {
             // Role verilerini ve ilişkili User verilerini DTO'ya dönüştürüyoruz
             var roles = await _context.Roles.Include(r => r.Users)
-                                            .Select(r => new RoleDTO
-                                            {
-                                                Role_ID = r.Role_ID,
-                                                RoleName = r.RoleName,
-                                                Description = r.Description,
-                                                Users = r.Users.Select(u => new UserDTO
-                                                {
-                                                    User_ID = u.User_ID,
-                                                    FirstName = u.FirstName,
-                                                    LastName = u.LastName,
-                                                    Email = u.Email,
-                                                    PhoneNumber = u.PhoneNumber
-                                                }).ToList()
-                                            }).ToListAsync();
+                                .Select(r => new RoleDTO
+                                {
+                                    Role_ID = r.Role_ID,
+                                    RoleName = r.RoleName,
+                                    Description = r.Description,
+                                    Users = r.Users.Select(u => new UserDTO
+                                    {
+                                        User_ID = u.User_ID,
+                                        FirstName = u.FirstName,
+                                        LastName = u.LastName,
+                                        Email = u.Email,
+                                        PhoneNumber = u.PhoneNumber,
+                                        // RoleController'daki RoleName alanını UserDTO'ya atama
+                                        RoleName = r.RoleName
+                                    }).ToList()
+                                }).ToListAsync();
 
             return roles;
         }

@@ -1,0 +1,12 @@
+syntax: glob
+*.suo
+*.user
+*.cache
+*.exe
+*.dll
+*.pdb
+*.vsidx
+obj/
+bin/
+node_modules/
+.vs/
