@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .hg/
+echo ".hg/" >> .gitignore
+

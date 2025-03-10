@@ -138,7 +138,7 @@ namespace CarRentalAPI.Controllers
                 .Include(r => r.User)
                 .ToListAsync();
         }
-        //
+        
 
         // Rezervasyon var mı kontrolü
         private bool ReservationExists(int id)
