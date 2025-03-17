@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CarRentalAPI.DTO;
+using CarRentalAPI.Helpers;
 
 
 namespace CarRentalAPI.Controllers
@@ -51,7 +52,7 @@ namespace CarRentalAPI.Controllers
                                                 LastName = u.LastName,
                                                 Email = u.Email,
                                                 PhoneNumber = u.PhoneNumber,
-                                                RoleName = u.Role != null ? u.Role.RoleName : "No Role Assigned"
+                                                Role_ID = u.Role_ID
                                             }).ToListAsync();
 
             return users;
@@ -69,7 +70,7 @@ namespace CarRentalAPI.Controllers
                                                LastName = u.LastName,
                                                Email = u.Email,
                                                PhoneNumber = u.PhoneNumber,
-                                               RoleName = u.Role.RoleName
+                                               Role_ID = u.Role_ID,
                                            })
                                            .FirstOrDefaultAsync(u => u.User_ID == id);
 
@@ -84,32 +85,82 @@ namespace CarRentalAPI.Controllers
 
         //3. Post: api/Users ==> Yeni kullanıcı eklemek için
         [HttpPost]
-        public async  Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<UserDTO>> CreateUser(UserDTO userDTO)
         {
+            if (string.IsNullOrWhiteSpace(userDTO.Password))
+            {
+                return BadRequest("Password is required!");
+            }
+
+            // Şifreyi hashleyerek kaydet
+            PasswordHelper.CreatePasswordHash(userDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var user = new User
+            {
+                FirstName = userDTO.FirstName,
+                LastName = userDTO.LastName,
+                Email = userDTO.Email,
+                PhoneNumber = userDTO.PhoneNumber,
+                Role_ID = userDTO.Role_ID,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                CreatedDate = DateTime.UtcNow
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.User_ID }, user);
+            var createdUserDTO = new UserDTO
+            {
+                User_ID = user.User_ID,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Role_ID = user.Role_ID
+            };
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.User_ID }, createdUserDTO);
         }
+
+
 
         //4. Put: api/Users/5 ==> Mevcut kullanıcıyı güncelleme
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, UserDTO userDTO)
         {
-            if(id!=user.User_ID)
+            if (id != userDTO.User_ID)
             {
-                return BadRequest("Güncellenmek istenen kullanıcı ID'sine ulaşılamıyor!");
+                return BadRequest("Güncellenmek istenen kullanıcı ID'si eşleşmiyor!");
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return NotFound("Kullanıcı bulunamadı.");
+            }
 
+            // Kullanıcı bilgilerini güncelle
+            existingUser.FirstName = userDTO.FirstName;
+            existingUser.LastName = userDTO.LastName;
+            existingUser.Email = userDTO.Email;
+            existingUser.PhoneNumber = userDTO.PhoneNumber;
+            existingUser.Role_ID = userDTO.Role_ID;
+
+            // Şifre güncelleme kontrolü
+            if (!string.IsNullOrEmpty(userDTO.Password))
+            {
+                PasswordHelper.CreatePasswordHash(userDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                existingUser.PasswordHash = passwordHash;
+                existingUser.PasswordSalt = passwordSalt;
+            }
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch(DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException)
             {
-                if(!UserExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -118,8 +169,12 @@ namespace CarRentalAPI.Controllers
                     throw;
                 }
             }
+
             return NoContent();
         }
+
+
+
 
         //5. Delete: api/Users/5 ==> İstenilen bir kullanıcıyı silme işlemi
         [HttpDelete("{id}")]

@@ -37,7 +37,7 @@ namespace CarRentalAPI.Controllers
                                         Email = u.Email,
                                         PhoneNumber = u.PhoneNumber,
                                         // RoleController'daki RoleName alanını UserDTO'ya atama
-                                        RoleName = r.RoleName
+                                        Role_ID = u.Role_ID,
                                     }).ToList()
                                 }).ToListAsync();
 
