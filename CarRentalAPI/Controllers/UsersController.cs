@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CarRentalAPI.DTO;
 using CarRentalAPI.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace CarRentalAPI.Controllers
@@ -56,6 +57,13 @@ namespace CarRentalAPI.Controllers
                                             }).ToListAsync();
 
             return users;
+        }
+
+        [Authorize]
+        [HttpGet("secret")]
+        public IActionResult SecretData()
+        {
+            return Ok("Bu bilgi sadece token sahiplerine özel 😎");
         }
 
 
@@ -197,6 +205,8 @@ namespace CarRentalAPI.Controllers
         {
             return _context.Users.Any(e=>e.User_ID==id);
         }
+
+       
 
     }                                       
 }
