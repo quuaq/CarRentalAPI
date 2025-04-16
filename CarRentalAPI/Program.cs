@@ -30,7 +30,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-
 // ➕ DB bağlantısı
 builder.Services.AddDbContext<Context>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
