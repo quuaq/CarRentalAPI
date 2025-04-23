@@ -96,5 +96,21 @@ namespace CarRentalAPI.Controllers
         {
             return _context.Cars.Any(e=>e.Car_ID == id);
         }
+
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailableCars(DateTime start, DateTime end)
+        {
+            // Gelen tarihleri UTC olarak ayarla
+            start = DateTime.SpecifyKind(start, DateTimeKind.Utc);
+            end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
+
+            var availableCars = await _context.Cars
+                .Where(c => c.IsAvailable == true) // veya tarih bazlı uygunluk sorgusu
+                .ToListAsync();
+
+            return Ok(availableCars);
+        }
+
+
     }
 }
