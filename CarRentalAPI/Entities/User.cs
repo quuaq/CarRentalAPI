@@ -14,6 +14,7 @@ namespace CarRentalAPI.Entities
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? TcNo { get; set; }
         public int Role_ID { get; set; }
         public DateTime CreatedDate { get; set; } // Hesap olıuşturma tarihi
 

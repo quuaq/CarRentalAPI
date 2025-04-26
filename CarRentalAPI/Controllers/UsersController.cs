@@ -53,6 +53,7 @@ namespace CarRentalAPI.Controllers
                                                 LastName = u.LastName,
                                                 Email = u.Email,
                                                 PhoneNumber = u.PhoneNumber,
+                                                TcNo = u.TcNo,
                                                 Role_ID = u.Role_ID
                                             }).ToListAsync();
 
@@ -78,6 +79,7 @@ namespace CarRentalAPI.Controllers
                                                LastName = u.LastName,
                                                Email = u.Email,
                                                PhoneNumber = u.PhoneNumber,
+                                               TcNo=u.TcNo,
                                                Role_ID = u.Role_ID,
                                            })
                                            .FirstOrDefaultAsync(u => u.User_ID == id);
@@ -109,6 +111,7 @@ namespace CarRentalAPI.Controllers
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
                 PhoneNumber = userDTO.PhoneNumber,
+                TcNo = userDTO.TcNo,
                 Role_ID = userDTO.Role_ID,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
@@ -125,6 +128,7 @@ namespace CarRentalAPI.Controllers
                 LastName = user.LastName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                TcNo = user.TcNo,
                 Role_ID = user.Role_ID
             };
 
@@ -153,6 +157,7 @@ namespace CarRentalAPI.Controllers
             existingUser.LastName = userDTO.LastName;
             existingUser.Email = userDTO.Email;
             existingUser.PhoneNumber = userDTO.PhoneNumber;
+            existingUser.TcNo = userDTO.TcNo;
             existingUser.Role_ID = userDTO.Role_ID;
 
             // Şifre güncelleme kontrolü
