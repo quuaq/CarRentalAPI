@@ -8,5 +8,7 @@ namespace CarRentalAPI.DataAccess
         Task<User> Register(UserForRegisterDTO userForRegisterDto);
         Task<User?> Login(UserForLoginDTO userForLoginDto);
         Task<bool> UserExists(string email);
+        
     }
 }
+

@@ -84,24 +84,26 @@ namespace CarRentalAPI.Controllers
         }
 
 
-        // add a new Payment
         [HttpPost]
         public async Task<ActionResult<PaymentDTO>> CreatePayment(PaymentDTO paymentDTO)
         {
-            // Geçmiş tarihe ödeme kabul etme
             if (paymentDTO.PaymentDate < DateTime.UtcNow)
             {
                 return BadRequest("The payment date cannot be an expired date!");
             }
 
-            // Reservation var mı kontrol et
             var reservation = await _context.Reservations.FindAsync(paymentDTO.Reservation_ID);
             if (reservation == null)
             {
                 return NotFound("No connected reservation found.");
             }
 
-            // Yeni Payment nesnesi oluştur
+            if (paymentDTO.PaymentStatus == "Paid")
+            {
+                reservation.Status = "Paid";
+                _context.Reservations.Update(reservation);
+            }
+
             var payment = new Payment
             {
                 Reservation_ID = paymentDTO.Reservation_ID,
@@ -109,13 +111,17 @@ namespace CarRentalAPI.Controllers
                 Amount = paymentDTO.Amount,
                 PaymentMethod = paymentDTO.PaymentMethod,
                 PaymentStatus = paymentDTO.PaymentStatus,
-                Reservation = reservation // Bağlantıyı kur
+                Reservation = reservation
             };
 
             _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // 1. Payment_ID oluştu
 
-            // Kaydedilen veriyi DTO olarak döndür
+            // 2. Reservation tablosuna yaz
+            reservation.Payment_ID = payment.Payment_ID;
+            _context.Reservations.Update(reservation);
+            await _context.SaveChangesAsync(); // 🔥 Bu satırla birlikte otomatik eşleşir
+
             var createdPaymentDTO = new PaymentDTO
             {
                 Payment_ID = payment.Payment_ID,
@@ -124,7 +130,7 @@ namespace CarRentalAPI.Controllers
                 Amount = payment.Amount,
                 PaymentMethod = payment.PaymentMethod,
                 PaymentStatus = payment.PaymentStatus,
-                User_ID = reservation.User_ID, // Reservation içindeki User bilgisi
+                User_ID = reservation.User_ID,
                 Car_ID = reservation.Car_ID,
                 StartDate = reservation.StartDate,
                 EndDate = reservation.EndDate,
@@ -134,6 +140,8 @@ namespace CarRentalAPI.Controllers
 
             return CreatedAtAction(nameof(GetPayments), new { id = payment.Payment_ID }, createdPaymentDTO);
         }
+
+
 
 
         // ödeme güncelle (ödeme durumu değiştirilebilir)

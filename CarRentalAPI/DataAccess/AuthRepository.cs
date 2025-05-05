@@ -34,11 +34,15 @@ namespace CarRentalAPI.DataAccess
 
             var user = new User
             {
+                FirstName = userForRegisterDto.FirstName,
+                LastName = userForRegisterDto.LastName,
                 Email = userForRegisterDto.Email,
+                PhoneNumber = userForRegisterDto.PhoneNumber,
+                TcNo = userForRegisterDto.TcNo,  // ➡️ bunu da kaydet
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 CreatedDate = DateTime.UtcNow,
-                Role_ID = 3 // Default rolü User olarak ayarladık
+                Role_ID = 3 // Default user rolü
             };
 
             _context.Users.Add(user);
@@ -46,6 +50,7 @@ namespace CarRentalAPI.DataAccess
 
             return user;
         }
+
 
         public async Task<bool> UserExists(string email)
         {

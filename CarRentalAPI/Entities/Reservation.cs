@@ -13,11 +13,15 @@ namespace CarRentalAPI.Entities
         public DateTime EndDate { get; set; }
         public decimal TotalPrice { get; set; }
         public string? Status { get; set; }
+        public int? Payment_ID { get; set; }
 
         [ForeignKey("User_ID")]
         public virtual User? User { get; set; }
 
         [ForeignKey("Car_ID")]
         public virtual Car? Car { get; set; }
+
+        [ForeignKey("Payment_ID")]
+        public virtual Payment? Payment { get; set; }
     }
 }

@@ -129,16 +129,40 @@ namespace CarRentalAPI.Controllers
         }
 
         // Kullanıcının tüm rezervasyonlarını getirme
+        //[HttpGet("user/{userId}")]
+        //public async Task<ActionResult<IEnumerable<Reservation>>> GetReservationsByUser(int userId)
+        //{
+        //    return await _context.Reservations
+        //        .Where(r => r.User_ID == userId)
+        //        .Include(r => r.Car)
+        //        .Include(r => r.User)
+        //        .ToListAsync();
+        //}
+
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<Reservation>>> GetReservationsByUser(int userId)
+        public async Task<ActionResult<IEnumerable<ReservationDTO>>> GetReservationsByUser(int userId)
         {
-            return await _context.Reservations
+            var reservations = await _context.Reservations
                 .Where(r => r.User_ID == userId)
                 .Include(r => r.Car)
-                .Include(r => r.User)
+                .Include(r => r.Payment)
+                .Select(r => new ReservationDTO
+                {
+                    Reservation_ID = r.Reservation_ID,
+                    User_ID = r.User_ID,
+                    Car_ID = r.Car_ID,
+                    StartDate = r.StartDate,
+                    EndDate = r.EndDate,
+                    TotalPrice = r.TotalPrice,
+                    Status = r.Status,
+                    CarName = r.Car != null ? r.Car.Make + " " + r.Car.Model : "Bilinmeyen Araç",
+                    Payment_ID = r.Payment != null ? r.Payment.Payment_ID : null // 🔥 Burası eklendi
+                })
                 .ToListAsync();
+
+            return reservations;
         }
-        
+
 
         // Rezervasyon var mı kontrolü
         private bool ReservationExists(int id)
