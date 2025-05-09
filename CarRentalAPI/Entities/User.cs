@@ -17,6 +17,7 @@ namespace CarRentalAPI.Entities
         public string? TcNo { get; set; }
         public int Role_ID { get; set; }
         public DateTime CreatedDate { get; set; } // Hesap olıuşturma tarihi
+        public string? LicenseNumber { get; set; }
 
         [ForeignKey("Role_ID")]
         public virtual Role? Role { get; set; } // Foreing Key ilişkisi tanımlama

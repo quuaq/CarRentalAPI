@@ -11,5 +11,6 @@
         public int Role_ID { get; set; }  // RoleName yerine sadece Role_ID kullan
         public DateTime CreatedDate { get; set; }
         public string? Password { get; set; }
+        public string? LicenseNumber { get; set; }
     }
 }

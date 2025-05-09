@@ -8,5 +8,6 @@
         public string? Password { get; set; }
         public string? PhoneNumber { get; set; }
         public int Role_ID { get; set; }  // Varsayılan olarak 2 (normal kullanıcı) atanabilir
+        public string? LicenseNumber { get; set; }
     }
 }

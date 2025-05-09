@@ -39,6 +39,7 @@ namespace CarRentalAPI.DataAccess
                 Email = userForRegisterDto.Email,
                 PhoneNumber = userForRegisterDto.PhoneNumber,
                 TcNo = userForRegisterDto.TcNo,  // ➡️ bunu da kaydet
+                LicenseNumber = userForRegisterDto.LicenseNumber,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 CreatedDate = DateTime.UtcNow,

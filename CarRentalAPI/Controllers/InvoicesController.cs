@@ -55,6 +55,45 @@ namespace CarRentalAPI.Controllers
             return invoice;
         }
 
+        [HttpGet("details/by-payment/{paymentId}")]
+        public async Task<ActionResult<InvoiceDetailDTO>> GetInvoiceDetailsByPayment(int paymentId)
+        {
+            var invoice = await _context.Invoices
+                .Include(i => i.Payment)
+                    .ThenInclude(p => p.Reservation)
+                        .ThenInclude(r => r.Car)
+                .Include(i => i.Payment)
+                    .ThenInclude(p => p.Reservation)
+                        .ThenInclude(r => r.User)
+                .Where(i => i.Payment_ID == paymentId)
+                .Select(i => new InvoiceDetailDTO
+                {
+                    Invoice_ID = i.Invoice_ID,
+                    InvoiceDate = i.InvoiceDate,
+                    TotalAmount = i.TotalAmount,
+                    Payment_ID = i.Payment.Payment_ID,
+                    PaymentDate = i.Payment.PaymentDate,
+                    PaymentMethod = i.Payment.PaymentMethod,
+                    Reservation_ID = i.Payment.Reservation.Reservation_ID,
+                    StartDate = i.Payment.Reservation.StartDate,
+                    EndDate = i.Payment.Reservation.EndDate,
+                    Status = i.Payment.Reservation.Status,
+                    CarName = i.Payment.Reservation.Car.Make + " " + i.Payment.Reservation.Car.Model,
+                    FullName = i.Payment.Reservation.User.FirstName + " " + i.Payment.Reservation.User.LastName,
+                    Email = i.Payment.Reservation.User.Email
+                })
+                .FirstOrDefaultAsync();
+
+            if (invoice == null)
+            {
+                return NotFound("Fatura detayı bulunamadı.");
+            }
+
+            return invoice;
+        }
+
+
+
         // yeni fatura oluştur
         [HttpPost]
         public async Task<ActionResult<InvoiceDTO>> CreateInvoice(InvoiceDTO invoiceDTO)

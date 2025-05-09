@@ -101,7 +101,6 @@ namespace CarRentalAPI.Controllers
             if (paymentDTO.PaymentStatus == "Paid")
             {
                 reservation.Status = "Paid";
-                _context.Reservations.Update(reservation);
             }
 
             var payment = new Payment
@@ -115,12 +114,22 @@ namespace CarRentalAPI.Controllers
             };
 
             _context.Payments.Add(payment);
-            await _context.SaveChangesAsync(); // 1. Payment_ID oluştu
+            await _context.SaveChangesAsync(); // Önce payment'ı kaydet → ID oluşsun
 
-            // 2. Reservation tablosuna yaz
+            // 🔧 Eksik olan yer: Rezervasyon kaydına Payment_ID'yi yaz
             reservation.Payment_ID = payment.Payment_ID;
             _context.Reservations.Update(reservation);
-            await _context.SaveChangesAsync(); // 🔥 Bu satırla birlikte otomatik eşleşir
+            await _context.SaveChangesAsync(); // Güncellenmiş rezervasyonu kaydet
+
+            // ✅ Fatura otomatik oluşturuluyor
+            var invoice = new Invoice
+            {
+                Payment_ID = payment.Payment_ID,
+                InvoiceDate = DateTime.UtcNow,
+                TotalAmount = payment.Amount
+            };
+            _context.Invoices.Add(invoice);
+            await _context.SaveChangesAsync();
 
             var createdPaymentDTO = new PaymentDTO
             {
@@ -140,6 +149,7 @@ namespace CarRentalAPI.Controllers
 
             return CreatedAtAction(nameof(GetPayments), new { id = payment.Payment_ID }, createdPaymentDTO);
         }
+
 
 
 
