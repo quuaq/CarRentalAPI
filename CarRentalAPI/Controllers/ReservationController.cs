@@ -57,7 +57,9 @@ namespace CarRentalAPI.Controllers
                 StartDate = reservationDto.StartDate,
                 EndDate = reservationDto.EndDate,
                 TotalPrice = reservationDto.TotalPrice,
-                Status = reservationDto.Status
+                Status = reservationDto.Status,
+                IsTemporary = true, // Geçici rezervasyon
+                ExpireDate = DateTime.UtcNow.AddMinutes(1) // 15 dakika geçerli
             };
 
             _context.Reservations.Add(reservation);

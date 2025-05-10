@@ -11,5 +11,8 @@
         public decimal TotalPrice { get; set; }
         public string? Status { get; set; }
         public int? Payment_ID { get; set; }
+        public bool IsTemporary { get; set; }
+        public DateTime? ExpireDate { get; set; }
+
     }
 }

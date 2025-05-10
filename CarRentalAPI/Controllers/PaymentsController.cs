@@ -101,6 +101,8 @@ namespace CarRentalAPI.Controllers
             if (paymentDTO.PaymentStatus == "Paid")
             {
                 reservation.Status = "Paid";
+                reservation.IsTemporary = false; // Geçici rezervasyon değil
+                reservation.ExpireDate = null; // Geçerlilik süresi yok
             }
 
             var payment = new Payment

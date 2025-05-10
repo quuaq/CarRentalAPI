@@ -97,6 +97,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHostedService<ReservationCleanerService>();
 
 builder.Services.AddCors(options =>
 {
@@ -175,6 +176,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 
 app.UseCors("AllowAngularApp");

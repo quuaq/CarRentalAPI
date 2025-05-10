@@ -14,6 +14,8 @@ namespace CarRentalAPI.Entities
         public decimal TotalPrice { get; set; }
         public string? Status { get; set; }
         public int? Payment_ID { get; set; }
+        public bool IsTemporary { get; set; } = true;
+        public DateTime? ExpireDate { get; set; }
 
         [ForeignKey("User_ID")]
         public virtual User? User { get; set; }

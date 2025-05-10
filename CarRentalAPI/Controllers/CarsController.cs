@@ -17,11 +17,21 @@ namespace CarRentalAPI.Controllers
             _context = context;
         }
 
-        // 1. Get: api/Cars ==> Tüm araçları listelemeye yarar
+        // 1. Get: api/Cars ==> Rezervasyon durumuna göre tüm araçları listelemeye yarar
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Car>>> GetCars()
         {
-            return await _context.Cars.ToListAsync();
+            var currentDate = DateTime.UtcNow;
+            var reservedCarIds = await _context.Reservations
+                .Where(r =>
+                    (r.Status == "Pending" && r.ExpireDate > currentDate && r.IsTemporary) ||
+                    (r.Status == "Paid"))
+                .Select(r => r.Car_ID)
+                .ToListAsync();
+
+            return await _context.Cars
+                .Where(c => !reservedCarIds.Contains(c.Car_ID) && c.IsAvailable)
+                .ToListAsync();
         }
 
         // 2.Get: api/Cars/5 ==> Belirli bir aracı ID'ye göre getirme
@@ -97,15 +107,23 @@ namespace CarRentalAPI.Controllers
             return _context.Cars.Any(e=>e.Car_ID == id);
         }
 
+
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableCars(DateTime start, DateTime end)
         {
-            // Gelen tarihleri UTC olarak ayarla
             start = DateTime.SpecifyKind(start, DateTimeKind.Utc);
             end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
 
             var availableCars = await _context.Cars
-                .Where(c => c.IsAvailable == true) // veya tarih bazlı uygunluk sorgusu
+                .Where(car => !_context.Reservations.Any(r =>
+                    r.Car_ID == car.Car_ID &&
+                    (
+                        r.Status == "Paid" ||
+                        (r.IsTemporary && r.ExpireDate > DateTime.UtcNow)
+                    ) &&
+                    // Tarih çakışmasını kontrol et
+                    !(r.EndDate <= start || r.StartDate >= end)
+                ))
                 .ToListAsync();
 
             return Ok(availableCars);
