@@ -15,6 +15,7 @@ namespace CarRentalAPI.DataAccess
         public DbSet<Payment> Payments { get; set; } 
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
 
     }

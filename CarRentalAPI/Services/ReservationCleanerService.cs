@@ -20,6 +20,7 @@ public class ReservationCleanerService : BackgroundService
             {
                 var context = scope.ServiceProvider.GetRequiredService<Context>();
 
+                
                 var expiredReservations = await context.Reservations
                     .Where(r => r.IsTemporary && r.ExpireDate < DateTime.UtcNow)
                     .ToListAsync();
@@ -27,14 +28,29 @@ public class ReservationCleanerService : BackgroundService
                 if (expiredReservations.Any())
                 {
                     context.Reservations.RemoveRange(expiredReservations);
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(stoppingToken);
+                    _logger.LogInformation($"{expiredReservations.Count} expired reservations cleaned.");
+                }
 
-                    _logger.LogInformation($"{expiredReservations.Count} expired reservations cleaned at {DateTime.UtcNow}.");
+                
+                var completedReservations = await context.Reservations
+                    .Where(r => r.Status == "Paid" && r.EndDate < DateTime.UtcNow)
+                    .ToListAsync();
+
+                foreach (var reservation in completedReservations)
+                {
+                    reservation.Status = "Completed";
+                }
+
+                if (completedReservations.Any())
+                {
+                    await context.SaveChangesAsync(stoppingToken);
+                    _logger.LogInformation($"{completedReservations.Count} reservations marked as completed.");
                 }
             }
 
             
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
         }
     }
 }

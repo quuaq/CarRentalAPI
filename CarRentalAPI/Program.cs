@@ -94,10 +94,13 @@ using CarRentalAPI.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CarRentalAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHostedService<ReservationCleanerService>();
+builder.Services.AddScoped<LogService>();
+
 
 builder.Services.AddCors(options =>
 {

@@ -3,6 +3,7 @@ using System;
 using CarRentalAPI.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarRentalAPI.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250513200718_FixLogTable")]
+    partial class FixLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,9 +104,12 @@ namespace CarRentalAPI.Migrations
                     b.Property<int>("User_ID")
                         .HasColumnType("integer");
 
+                    b.Property<int>("User_ID1")
+                        .HasColumnType("integer");
+
                     b.HasKey("Log_ID");
 
-                    b.HasIndex("User_ID");
+                    b.HasIndex("User_ID1");
 
                     b.ToTable("Logs");
                 });
@@ -267,7 +273,7 @@ namespace CarRentalAPI.Migrations
                 {
                     b.HasOne("CarRentalAPI.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("User_ID")
+                        .HasForeignKey("User_ID1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

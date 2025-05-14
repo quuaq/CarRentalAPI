@@ -25,7 +25,7 @@ namespace CarRentalAPI.Controllers
             var reservedCarIds = await _context.Reservations
                 .Where(r =>
                     (r.Status == "Pending" && r.ExpireDate > currentDate && r.IsTemporary) ||
-                    (r.Status == "Paid"))
+                    (r.Status == "Paid" && r.EndDate > currentDate)) // Paid ve hâlâ kiradaysa
                 .Select(r => r.Car_ID)
                 .ToListAsync();
 
@@ -33,6 +33,7 @@ namespace CarRentalAPI.Controllers
                 .Where(c => !reservedCarIds.Contains(c.Car_ID) && c.IsAvailable)
                 .ToListAsync();
         }
+
 
         // 2.Get: api/Cars/5 ==> Belirli bir aracı ID'ye göre getirme
         [HttpGet("{id}")]
@@ -119,15 +120,17 @@ namespace CarRentalAPI.Controllers
                     r.Car_ID == car.Car_ID &&
                     (
                         r.Status == "Paid" ||
-                        (r.IsTemporary && r.ExpireDate > DateTime.UtcNow)
+                        (r.Status == "Pending" && r.ExpireDate > DateTime.UtcNow)
                     ) &&
-                    // Tarih çakışmasını kontrol et
-                    !(r.EndDate <= start || r.StartDate >= end)
+                    r.StartDate < end && r.EndDate > start
+
                 ))
                 .ToListAsync();
 
             return Ok(availableCars);
         }
+
+
 
 
     }

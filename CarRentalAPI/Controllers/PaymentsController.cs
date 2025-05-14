@@ -1,6 +1,7 @@
 ﻿using CarRentalAPI.DataAccess;
 using CarRentalAPI.DTO;
 using CarRentalAPI.Entities;
+using CarRentalAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace CarRentalAPI.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly LogService _logService;
 
-        public PaymentsController(Context context)
+        public PaymentsController(Context context, LogService logService)
         {
             _context = context;
+            _logService = logService;
         }
 
         // bring all payments
@@ -114,6 +117,8 @@ namespace CarRentalAPI.Controllers
                 PaymentStatus = paymentDTO.PaymentStatus,
                 Reservation = reservation
             };
+
+            _logService.AddLog(reservation.User_ID, "Payment Created", $"Amount: {payment.Amount}, Status: {payment.PaymentStatus}");
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync(); // Önce payment'ı kaydet → ID oluşsun

@@ -4,6 +4,7 @@ using CarRentalAPI.DataAccess;
 using CarRentalAPI.Entities;
 using Microsoft.EntityFrameworkCore;
 using CarRentalAPI.DTO;
+using CarRentalAPI.Services;
 
 
 namespace CarRentalAPI.Controllers
@@ -13,10 +14,12 @@ namespace CarRentalAPI.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly Context _context;
+        private readonly LogService _logService;
 
-        public ReservationController(Context context)
+        public ReservationController(Context context, LogService logService)
         {
             _context = context;
+            _logService = logService;
         }
 
         // Admin için tüm reservationları listeleme
@@ -59,11 +62,14 @@ namespace CarRentalAPI.Controllers
                 TotalPrice = reservationDto.TotalPrice,
                 Status = reservationDto.Status,
                 IsTemporary = true, // Geçici rezervasyon
-                ExpireDate = DateTime.UtcNow.AddMinutes(1) // 15 dakika geçerli
+                ExpireDate = DateTime.UtcNow.AddMinutes(2) // 15 dakika geçerli
             };
 
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
+
+            // rezervasyon oluşturulduğuna dair log
+            _logService.AddLog(reservation.User_ID, "Reservation Created", $"Car ID: {reservation.Car_ID}, Total Price: {reservation.TotalPrice}");
 
             return CreatedAtAction(nameof(GetReservation), new { id = reservation.Reservation_ID }, reservationDto);
         }
@@ -123,6 +129,9 @@ namespace CarRentalAPI.Controllers
             {
                 return NotFound();
             }
+
+            // silme için log
+            _logService.AddLog(reservation.User_ID, "Reservation Deleted", $"Reservation ID: {reservation.Reservation_ID}, Car ID: {reservation.Car_ID}");
 
             _context.Reservations.Remove(reservation);
             await _context.SaveChangesAsync();

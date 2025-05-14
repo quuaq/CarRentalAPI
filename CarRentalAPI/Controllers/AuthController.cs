@@ -1,6 +1,7 @@
 ﻿using CarRentalAPI.DataAccess;
 using CarRentalAPI.DTO;
 using CarRentalAPI.Entities;
+using CarRentalAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,11 +16,13 @@ namespace CarRentalAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _configuration;
+        private readonly LogService _logService;
 
-        public AuthController(IAuthRepository authRepository, IConfiguration configuration)
+        public AuthController(IAuthRepository authRepository, IConfiguration configuration, LogService logService)
         {
             _authRepository = authRepository;
             _configuration = configuration;
+            _logService = logService;
         }
 
         // Register Endpoint
@@ -33,6 +36,9 @@ namespace CarRentalAPI.Controllers
             }
 
             var user = await _authRepository.Register(request);
+
+            _logService.AddLog(user.User_ID, "User Registered", $"Email: {user.Email}");
+
             return Ok(user);
         }
 
@@ -43,6 +49,8 @@ namespace CarRentalAPI.Controllers
             var user = await _authRepository.Login(request);
             if (user == null)
                 return Unauthorized("Invalid email or password!");
+
+            _logService.AddLog(user.User_ID, "User Logged In", $"Email: {user.Email}");
 
             // Token oluştur
             var claims = new[]
@@ -69,5 +77,13 @@ namespace CarRentalAPI.Controllers
 
             return Ok(new { token = tokenHandler.WriteToken(token) });
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout([FromBody] int userId)
+        {
+            _logService.AddLog(userId, "User Logged Out", $"User with ID: {userId} logged out.");
+            return Ok(new { message = "User logged out and log recorded." });
+        }
+
     }
 }
