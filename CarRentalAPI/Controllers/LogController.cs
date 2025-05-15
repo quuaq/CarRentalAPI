@@ -26,7 +26,7 @@ namespace CarRentalAPI.Controllers
                 {
                     l.Action,
                     l.Timestamp,
-                    TcNo = l.User.TcNo,  // 🔥 Buraya dikkat!
+                    TcNo = l.User.TcNo,  
                     l.Details
                 })
                 .OrderByDescending(l => l.Timestamp)

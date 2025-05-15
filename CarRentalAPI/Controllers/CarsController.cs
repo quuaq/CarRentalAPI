@@ -92,15 +92,75 @@ namespace CarRentalAPI.Controllers
         public async Task<IActionResult> DeleteCar(int id)
         {
             var car = await _context.Cars.FindAsync(id);
-            if(car == null)
+            if (car == null)
             {
-                return NotFound();
+                return NotFound("Car not found.");
+            }
+
+            // Aktif rezervasyon kontrolü
+            bool hasActiveReservation = await _context.Reservations.AnyAsync(r =>
+                r.Car_ID == id &&
+                (r.Status == "Pending" || r.Status == "Paid")
+            );
+
+            if (hasActiveReservation)
+            {
+                return BadRequest("This car cannot be deleted because it has active reservations.");
+            }
+
+            // Eğer resim dosyası varsa onu da silelim
+            if (!string.IsNullOrEmpty(car.ImagePath))
+            {
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", car.ImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
             }
 
             _context.Cars.Remove(car);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
+
+        // aracın plakasına göre aracı silme
+        [HttpDelete("by-plate/{plate}")]
+        public async Task<IActionResult> DeleteCarByPlate(string plate)
+        {
+            var car = await _context.Cars.FirstOrDefaultAsync(c => c.LicensePlate == plate);
+            if (car == null)
+            {
+                return NotFound("Car not found with this license plate.");
+            }
+
+            bool hasActiveReservation = await _context.Reservations.AnyAsync(r =>
+                r.Car_ID == car.Car_ID &&
+                (r.Status == "Pending" || r.Status == "Paid")
+            );
+
+            if (hasActiveReservation)
+            {
+                return BadRequest("This car is currently under active reservation or has been paid for.");
+            }
+
+            // Resim silme ve araba silme işlemi devam eder...
+            if (!string.IsNullOrEmpty(car.ImagePath))
+            {
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", car.ImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            _context.Cars.Remove(car);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
 
         //CarExists metodunu tanımlayalım. Aracın var olup olmadığını kontrol eder.
         private bool CarExists(int id)
@@ -129,6 +189,39 @@ namespace CarRentalAPI.Controllers
 
             return Ok(availableCars);
         }
+
+        // resim yükleme yeri
+        [HttpPost("upload-image/{id}")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile file)
+        {
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null) return NotFound();
+
+            if (file != null && file.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                car.ImagePath = $"/images/{uniqueFileName}";
+                await _context.SaveChangesAsync();
+
+                return Ok(new { imagePath = car.ImagePath });
+            }
+
+            return BadRequest("Invalid file.");
+        }
+
 
 
 

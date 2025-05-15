@@ -95,6 +95,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CarRentalAPI.Services;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -172,6 +173,9 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
+
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -180,6 +184,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// arabanın resmini sucunuda tutması için 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images")),
+    RequestPath = "/images"
+});
 
 
 

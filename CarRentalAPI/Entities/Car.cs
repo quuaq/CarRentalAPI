@@ -13,6 +13,7 @@ namespace CarRentalAPI.Entities
         public decimal PricePerDay { get; set; } // Günlük Kiralama Ücreti
         public bool IsAvailable { get; set; } // Mevcut mu 
         public string? LicensePlate { get; set; } // Plaka Numarası
+        public string? ImagePath { get; set; } 
 
     }
 }
