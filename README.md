@@ -55,5 +55,11 @@ Angular tabanlı ön yüz ile kolayca entegre olarak profesyonel bir araç kiral
 
 ![Database Schema](image.png)
 
+## Licence
+
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for more details.
+
+
 
 
