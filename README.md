@@ -53,7 +53,7 @@ Angular tabanlı ön yüz ile kolayca entegre olarak profesyonel bir araç kiral
 
 ## Database Schema Overview
 
-
+![Database Schema](image.png)
 
 
 
