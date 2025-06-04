@@ -51,6 +51,8 @@ Angular tabanlı ön yüz ile kolayca entegre olarak profesyonel bir araç kiral
 - Admin panel uç noktaları
 - Admin log uç noktası
 
+## Database Schema Overview
+
 
 
 
